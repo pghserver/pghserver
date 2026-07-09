@@ -1,7 +1,6 @@
 package com.pghserver.runtime;
 
 import com.pghserver.api.type.Request;
-import com.pghserver.api.type.RequestMethod;
 import com.pghserver.api.type.Response;
 import com.pghserver.api.type.ResponseStatus;
 import com.pghserver.runtime.api.PghServer;
@@ -12,7 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
-import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,32 +24,9 @@ public class Main {
         if (args.length == 1 && Pattern.compile("[0-9]+").matcher(args[0]).matches())
             port = Integer.parseInt(args[0]);
 
+        PluginManager.load();
         PghServer server = new PghServer();
-
-        server.route("/.*", (req, res) -> {
-            if (req.method() != RequestMethod.GET) {
-                res.status(ResponseStatus.METHOD_NOT_ALLOWED);
-                res.contentType("text/plain");
-                res.body(res.status().toString());
-                return;
-            }
-
-            res.contentType("text/html; charset=utf-8");
-            res.body("<h1>Hello! " + res.status() + "</h1>", StandardCharsets.UTF_8);
-        });
-
-        server.route("/[0-9]+", (req, res) -> {
-            if (req.method() != RequestMethod.GET) {
-                res.status(ResponseStatus.METHOD_NOT_ALLOWED);
-                res.contentType("text/plain");
-                res.body(res.status().toString());
-                return;
-            }
-
-            res.contentType("text/html; charset=utf-8");
-            res.body("<h1>Page " + req.path().split("/", 2)[1] + "</h1>", StandardCharsets.UTF_8);
-        });
-
+        PluginManager.onEnable(server);
         try (var serverSocket = new ServerSocket(port)) {
             PghLogger.info("Started PghServer on port " + serverSocket.getLocalPort() + "!");
             PghLogger.info("Press Enter to stop it.");
@@ -95,5 +70,7 @@ public class Main {
         } catch (IOException ex) {
             PghLogger.fatal("Could not start PghServer!", ex);
         }
+
+        PluginManager.onDisable(server);
     }
 }
