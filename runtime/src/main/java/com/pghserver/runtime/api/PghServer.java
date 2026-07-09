@@ -14,7 +14,7 @@ public class PghServer implements PghAPI {
     private final @NotNull Path directory;
     private final @NotNull Router routes;
 
-    public PghServer(Path directory) {
+    public PghServer(@NotNull Path directory) {
         this.directory = directory;
         routes = new Router();
     }

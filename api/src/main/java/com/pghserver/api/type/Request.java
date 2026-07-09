@@ -280,7 +280,7 @@ public class Request {
         }
 
         String host = lowerHeaders.getOrDefault("host", "");
-        String cleanPath = "";
+        String cleanPath = path;
         LinkedHashMap<String, String> query = new LinkedHashMap<>();
         if (path.contains("?")) {
             String[] pathQuery = path.split(Pattern.quote("?"), 2);
