@@ -1,3 +1,5 @@
+.pghdev/
+
 # Gradle
 .gradle/
 **/build/

@@ -9,6 +9,10 @@ public class PghLogger {
         base(System.out, "info", message);
     }
 
+    public static void warn(Object... message) {
+        base(System.err, "warning", message);
+    }
+
     public static void error(Object... message) {
         base(System.err, "error", message);
     }

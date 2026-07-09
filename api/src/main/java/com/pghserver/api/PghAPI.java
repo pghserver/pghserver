@@ -4,6 +4,7 @@ import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 public interface PghAPI {
@@ -31,6 +32,10 @@ public interface PghAPI {
      * @param path Client-style path
      * @return Route handler
      */
-    @Nullable
-    RouteHandler resolve(@NotNull String path);
+    @Nullable RouteHandler resolve(@NotNull String path);
+
+    /**
+     * @return Directory used by the server for various resources. Can be used by plugins, for example, static file directories and media storage.
+     */
+    @NotNull Path directory();
 }

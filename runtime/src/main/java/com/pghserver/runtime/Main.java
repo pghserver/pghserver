@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
+import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,11 +22,15 @@ import java.util.regex.Pattern;
 public class Main {
     static void main(String[] args) {
         int port = 80;
-        if (args.length == 1 && Pattern.compile("[0-9]+").matcher(args[0]).matches())
+        if (args.length >= 1 && Pattern.compile("[0-9]+").matcher(args[0]).matches())
             port = Integer.parseInt(args[0]);
 
-        PluginManager.load();
-        PghServer server = new PghServer();
+        Path directory = Path.of(".");
+        if (args.length == 2)
+            directory = Path.of(args[1]);
+
+        var server = new PghServer(directory);
+        PluginManager.load(server.directory().resolve("plugins"));
         PluginManager.onEnable(server);
         try (var serverSocket = new ServerSocket(port)) {
             PghLogger.info("Started PghServer on port " + serverSocket.getLocalPort() + "!");

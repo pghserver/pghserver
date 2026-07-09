@@ -4,7 +4,7 @@
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="com.pghserver.runtime.Main" />
     <module name="pghserver.runtime.main" />
-    <option name="PROGRAM_PARAMETERS" value="3000" />
+    <option name="PROGRAM_PARAMETERS" value="3000 .pghdev" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

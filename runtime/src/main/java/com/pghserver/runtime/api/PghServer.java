@@ -7,12 +7,15 @@ import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 public class PghServer implements PghAPI {
-    private final Router routes;
+    private final @NotNull Path directory;
+    private final @NotNull Router routes;
 
-    public PghServer() {
+    public PghServer(Path directory) {
+        this.directory = directory;
         routes = new Router();
     }
 
@@ -29,5 +32,10 @@ public class PghServer implements PghAPI {
     @Override
     public @Nullable RouteHandler resolve(@NotNull String path) {
         return routes.resolve(path);
+    }
+
+    @Override
+    public @NotNull Path directory() {
+        return directory;
     }
 }
