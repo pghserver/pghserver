@@ -64,7 +64,7 @@ public class Main {
                         continue;
                     }
 
-                    var handler = server.resolve(request.path());
+                    var handler = server.resolve(request.url().path);
                     if (handler == null) response.status(ResponseStatus.NOT_FOUND);
                     else handler.run(request, response);
                     response.toOutputStream(out);

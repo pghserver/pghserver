@@ -8,10 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import static com.pghserver.api.PghConstants.CRLF_UTF8;
 import static com.pghserver.api.PghConstants.HTTP_VERSION;
@@ -21,7 +19,7 @@ import static com.pghserver.api.PghConstants.HTTP_VERSION;
  */
 public class Request {
     private final @NotNull RequestMethod method;
-    private final @NotNull String path;
+    private final @NotNull RequestUrl url;
     private final @NotNull Map<String, String> headers;
     private final @NotNull Map<String, String> lowerHeaders;
     private final byte[] body;
@@ -34,10 +32,10 @@ public class Request {
     }
 
     /**
-     * @return Route path requested by client
+     * @return URL requested by client
      */
-    public @NotNull String path() {
-        return path;
+    public @NotNull RequestUrl url() {
+        return url;
     }
 
     /**
@@ -92,13 +90,13 @@ public class Request {
      * Immutable request data created before any route handlers are resolved. Use inside route handlers for dynamic responses based off user input.
      *
      * @param method  Request method
-     * @param path    Route path requested by client
+     * @param url     URL requested by client
      * @param headers Request headers sent by client
      * @param body    Request body as an array of bytes
      */
-    public Request(@NotNull RequestMethod method, @NotNull String path, @NotNull Map<String, String> headers, byte[] body) {
+    public Request(@NotNull RequestMethod method, @NotNull RequestUrl url, @NotNull Map<String, String> headers, byte[] body) {
         this.method = method;
-        this.path = path;
+        this.url = url;
         this.headers = new HashMap<>(headers);
 
         lowerHeaders = new HashMap<>();
@@ -108,9 +106,9 @@ public class Request {
         this.body = body.clone();
     }
 
-    protected Request(@NotNull RequestMethod method, @NotNull String path, @NotNull Map<String, String> headers, @NotNull Map<String, String> lowerHeaders, byte[] body) {
+    protected Request(@NotNull RequestMethod method, @NotNull RequestUrl url, @NotNull Map<String, String> headers, @NotNull Map<String, String> lowerHeaders, byte[] body) {
         this.method = method;
-        this.path = path;
+        this.url = url;
         this.headers = new HashMap<>(headers);
         this.lowerHeaders = new HashMap<>(lowerHeaders);
         this.body = body.clone();
@@ -123,7 +121,7 @@ public class Request {
      * @throws IOException Any problems encountered while writing to the output stream
      */
     public void toOutputStream(OutputStream out) throws IOException {
-        String requestLine = method().name() + " " + path() + " " + HTTP_VERSION;
+        String requestLine = method().name() + " " + url().toStringWithoutHost() + " " + HTTP_VERSION;
         out.write(requestLine.getBytes(StandardCharsets.UTF_8));
         out.write(CRLF_UTF8);
 
@@ -281,6 +279,19 @@ public class Request {
             }
         }
 
-        return new Request(method, path, headers, lowerHeaders, rawBody);
+        String host = lowerHeaders.getOrDefault("host", "");
+        String cleanPath = "";
+        LinkedHashMap<String, String> query = new LinkedHashMap<>();
+        if (path.contains("?")) {
+            String[] pathQuery = path.split(Pattern.quote("?"), 2);
+            String[] queryEntries = pathQuery[1].split(Pattern.quote("&"));
+            cleanPath = pathQuery[0];
+            for (String raw : queryEntries) {
+                String[] queryEntry = raw.split(Pattern.quote("="), 2);
+                query.put(queryEntry[0], queryEntry[1]);
+            }
+        }
+
+        return new Request(method, new RequestUrl(host, cleanPath, query), headers, lowerHeaders, rawBody);
     }
 }
