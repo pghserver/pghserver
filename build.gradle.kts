@@ -4,7 +4,7 @@ plugins {
 
 allprojects {
     group = "com.pghserver"
-    version = "5"
+    version = "6"
 
     repositories {
         mavenCentral()

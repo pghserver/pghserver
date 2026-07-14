@@ -1,5 +1,6 @@
 package com.pghserver.runtime;
 
+import com.pghserver.api.type.ConnectionHeader;
 import com.pghserver.api.type.Request;
 import com.pghserver.api.type.Response;
 import com.pghserver.api.type.ResponseStatus;
@@ -37,15 +38,13 @@ public class Main {
 
                 var request = Request.fromInputStream(in, response);
                 if (request == null) break;
+                response.connection("close".equalsIgnoreCase(request.header("Connection")) ? ConnectionHeader.CLOSE : ConnectionHeader.KEEPALIVE);
 
                 var handler = server.resolve(request.url().path);
                 if (handler == null) response.status(ResponseStatus.NOT_FOUND);
                 else handler.run(request, response);
 
-                keepAlive = !"close".equalsIgnoreCase(request.header("Connection"));
-                if (keepAlive) response.header("Connection", "keep-alive");
-                else response.header("Connection", "close");
-
+                keepAlive = !"close".equalsIgnoreCase(response.header("Connection"));
                 response.toOutputStream(out);
                 out.flush();
             }

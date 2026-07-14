@@ -44,7 +44,7 @@ public class Response {
         status = ResponseStatus.OK;
         headers.clear();
         lowerHeaders.clear();
-        body = new byte[0];
+        body(new byte[0]);
     }
 
     /**
@@ -159,12 +159,50 @@ public class Response {
     }
 
     /**
+     * Shorthand for setting the response's connection header, determines whether the client should continue sending requests. This is rarely used, we recommend relying on the Content-Length header unless absolutely required.
+     *
+     * @param value Header's value
+     */
+    public void connection(String value) {
+        header("Connection", value);
+    }
+
+    /**
+     * Shorthand for setting the response's connection header, determines whether the client should continue sending requests. This is rarely used, we recommend relying on the Content-Length header unless absolutely required.
+     *
+     * @param value Header's value (enum)
+     */
+    public void connection(ConnectionHeader value) {
+        connection(value.s);
+    }
+
+    /**
      * Shorthand for setting the response's content type header.
      *
      * @param type MIME type
      */
     public void contentType(@NotNull String type) {
         header("Content-Type", type);
+    }
+
+    /**
+     * Redirects to the specified URL/path. Shorthand for setting the response's status code and location header.
+     *
+     * @param url       URL/path
+     * @param permanent Whether redirect is considered permanent
+     */
+    public void redirect(@NotNull String url, boolean permanent) {
+        status(permanent ? ResponseStatus.PERMANENT_REDIRECT : ResponseStatus.TEMPORARY_REDIRECT);
+        header("Location", url);
+    }
+
+    /**
+     * Redirects to the specified URL/path. Shorthand for setting the response's status code and location header.
+     *
+     * @param url URL/path
+     */
+    public void redirect(@NotNull String url) {
+        redirect(url, false);
     }
 
     /**
@@ -185,15 +223,6 @@ public class Response {
     }
 
     /**
-     * Sets the response body to UTF-8 text. Specify a charset after the text to switch out the encoding.
-     *
-     * @param text Text
-     */
-    public void body(String text) {
-        body(text.getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
      * Sets the response body to a specific encoding of text.
      *
      * @param text    Text
@@ -201,6 +230,15 @@ public class Response {
      */
     public void body(String text, Charset charset) {
         body(text.getBytes(charset));
+    }
+
+    /**
+     * Sets the response body to UTF-8 text. Specify a charset after the text to switch out the encoding.
+     *
+     * @param text Text
+     */
+    public void body(String text) {
+        body(text, StandardCharsets.UTF_8);
     }
 
     /**
