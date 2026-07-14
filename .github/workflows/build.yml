@@ -24,11 +24,11 @@ jobs:
 
       - name: Build JAR
         run: |
-          ./gradlew build
+          ./gradlew runtime:build
 
       - name: Upload to GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh release upload "${{ github.event.release.tag_name }}" build/libs/*
+          gh release upload "${{ github.event.release.tag_name }}" runtime/build/libs/*
