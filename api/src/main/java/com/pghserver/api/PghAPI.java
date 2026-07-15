@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public interface PghAPI {
@@ -27,12 +28,20 @@ public interface PghAPI {
     void route(@NotNull @Language("RegExp") String path, @NotNull RouteHandler handler);
 
     /**
-     * Resolves client-style paths to a route handler, if it is registered anywhere in the runtime/plugin.
+     * Resolves client-style paths to a few route handlers, if it is registered anywhere in the runtime/plugins.
+     *
+     * @param path Client-style path
+     * @return Route handler list
+     */
+    @NotNull List<RouteHandler> resolve(@NotNull String path);
+
+    /**
+     * Resolves client-style paths to a single route handler, if it is registered anywhere in the runtime/plugins.
      *
      * @param path Client-style path
      * @return Route handler
      */
-    @Nullable RouteHandler resolve(@NotNull String path);
+    @Nullable RouteHandler resolveFirst(@NotNull String path);
 
     /**
      * @return Directory used by the server for various resources. Can be used by plugins, for example, static file directories and media storage.

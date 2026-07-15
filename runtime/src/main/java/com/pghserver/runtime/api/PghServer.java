@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class PghServer implements PghAPI {
@@ -30,8 +31,13 @@ public class PghServer implements PghAPI {
     }
 
     @Override
-    public @Nullable RouteHandler resolve(@NotNull String path) {
+    public @NotNull List<RouteHandler> resolve(@NotNull String path) {
         return routes.resolve(path);
+    }
+
+    @Override
+    public @Nullable RouteHandler resolveFirst(@NotNull String path) {
+        return resolve(path).getFirst();
     }
 
     @Override

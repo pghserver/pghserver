@@ -24,6 +24,16 @@ import java.util.regex.Pattern;
 public class Main {
     private static final Logger logger = new Logger(Main.class, System.out, System.err, System.err, System.err);
 
+    private static void handlerAttempts(PghServer server, Request request, Response response, int handlerIdx) {
+        var handlers = server.resolve(request.url().path);
+        if (handlerIdx >= handlers.size()) {
+            response.status(ResponseStatus.NOT_FOUND);
+            return;
+        }
+
+        handlers.get(handlerIdx).run(request, response, () -> handlerAttempts(server, request, response, handlerIdx + 1));
+    }
+
     private static void handle(PghServer server, Socket socket) {
         try (socket; var in = new DataInputStream(socket.getInputStream()); var out = new DataOutputStream(socket.getOutputStream())) {
             boolean keepAlive = true;
@@ -40,9 +50,7 @@ public class Main {
                 if (request == null) break;
                 response.connection("close".equalsIgnoreCase(request.header("Connection")) ? ConnectionHeader.CLOSE : ConnectionHeader.KEEPALIVE);
 
-                var handler = server.resolve(request.url().path);
-                if (handler == null) response.status(ResponseStatus.NOT_FOUND);
-                else handler.run(request, response);
+                handlerAttempts(server, request, response, 0);
 
                 keepAlive = !"close".equalsIgnoreCase(response.header("Connection"));
                 response.toOutputStream(out);
