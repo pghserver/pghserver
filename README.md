@@ -1,5 +1,5 @@
 <div align="center">
-	<h1>PghServer</h1>
+	<h1><img alt="PghServer" src=".github/branding/PghServer.svg" width="256" /></h1>
 </div>
 
 > Refer to the [API README](api/README.md) for help with creating a plugin, and including the necessary libraries for
