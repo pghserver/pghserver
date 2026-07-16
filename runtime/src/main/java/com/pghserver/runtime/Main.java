@@ -5,6 +5,8 @@ import com.pghserver.api.type.Request;
 import com.pghserver.api.type.Response;
 import com.pghserver.api.type.ResponseStatus;
 import com.pghserver.runtime.api.PghServer;
+import com.pghserver.runtime.api.type.RuntimeRequest;
+import com.pghserver.runtime.api.type.RuntimeResponse;
 import com.pghserver.runtime.util.Logger;
 
 import java.io.DataInputStream;
@@ -25,9 +27,9 @@ public class Main {
     private static final Logger logger = new Logger(Main.class, System.out, System.err, System.err, System.err);
 
     private static void handlerAttempts(PghServer server, Request request, Response response, int handlerIdx) {
-        var handlers = server.resolve(request.url().path);
+        var handlers = server.resolve(request.url().path());
         if (handlerIdx >= handlers.size()) {
-            if (response.status().equals(ResponseStatus.OK)) response.status(ResponseStatus.NOT_FOUND);
+            response.status(ResponseStatus.NOT_FOUND);
             return;
         }
 
@@ -38,7 +40,7 @@ public class Main {
         try (socket; var in = new DataInputStream(socket.getInputStream()); var out = new DataOutputStream(socket.getOutputStream())) {
             boolean keepAlive = true;
             while (keepAlive) {
-                var response = new Response();
+                var response = new RuntimeResponse();
                 response.header("Date", DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US)
                         .withZone(ZoneId.of("GMT"))
                         .format(ZonedDateTime.now()));
@@ -46,7 +48,7 @@ public class Main {
                 response.header("Server", "Production-Grade HTTP Server (PghServer)");
                 response.header("Connection", "keep-alive");
 
-                var request = Request.fromInputStream(in, response);
+                var request = RuntimeRequest.fromInputStream(in, response);
                 if (request == null) break;
                 response.connection("close".equalsIgnoreCase(request.header("Connection")) ? ConnectionHeader.CLOSE : ConnectionHeader.KEEPALIVE);
 

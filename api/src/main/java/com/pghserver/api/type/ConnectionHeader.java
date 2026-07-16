@@ -2,14 +2,7 @@ package com.pghserver.api.type;
 
 import org.jetbrains.annotations.NotNull;
 
-public enum ConnectionHeader {
-    CLOSE("close"),
-    KEEPALIVE("keep-alive"),
-    ;
-
-    public final @NotNull String s;
-
-    ConnectionHeader(@NotNull String s) {
-        this.s = s;
-    }
+public class ConnectionHeader {
+    public static final @NotNull String CLOSE = "close";
+    public static final @NotNull String KEEPALIVE = "keep-alive";
 }
