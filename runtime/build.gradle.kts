@@ -13,6 +13,12 @@ dependencies {
     implementation(project(":api"))
 }
 
+tasks.processResources {
+    filesMatching("release.pgh") {
+        expand("version" to project.version.toString())
+    }
+}
+
 tasks.jar {
     archiveBaseName.set("pghserver")
     archiveVersion.set(project.name)

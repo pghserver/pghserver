@@ -50,4 +50,12 @@ public class Logger implements PghLogger {
                 .map(String::valueOf)
                 .toList()));
     }
+
+    public static Logger system(Object source) {
+        return new Logger(source, System.out, System.err, System.err, System.err);
+    }
+
+    public static Logger system(Class<?> clazz) {
+        return new Logger(clazz, System.out, System.err, System.err, System.err);
+    }
 }

@@ -16,7 +16,7 @@ import java.util.Properties;
 import java.util.jar.JarFile;
 
 public class PluginManager {
-    private static final Logger logger = new Logger(PluginManager.class, System.out, System.err, System.err, System.err);
+    private static final Logger logger = Logger.system(PluginManager.class);
     private static final List<PghPlugin> plugins = new ArrayList<>();
     private static final List<URLClassLoader> classLoaders = new ArrayList<>();
 
@@ -54,6 +54,7 @@ public class PluginManager {
             var name = properties.getProperty("name");
             var version = properties.getProperty("version");
             var mainClassName = properties.getProperty("main-class");
+            var pghVersion = properties.getProperty("pgh");
 
             if (name == null || name.isBlank()) {
                 logger.error("Plugin missing required name field!", jarName);
@@ -71,6 +72,24 @@ public class PluginManager {
                 logger.error("Plugin missing required main-class field!", jarName);
                 jar.close();
                 return;
+            }
+
+            if (pghVersion != null && !pghVersion.isBlank() && !Main.release.isDev()) {
+                int plugin;
+                try {
+                    plugin = Integer.parseInt(pghVersion);
+                } catch (NumberFormatException ex) {
+                    logger.error("Plugin has non-integer pgh field!", jarName);
+                    jar.close();
+                    return;
+                }
+
+                int pgh = Main.release.version();
+                if (plugin != pgh) {
+                    logger.error("Plugin not for your PghServer version! You're running v" + pgh + ", plugin is for v" + plugin + ".", jarName);
+                    jar.close();
+                    return;
+                }
             }
 
             var classEntry = jar.getJarEntry(mainClassName.replace('.', '/') + ".class");

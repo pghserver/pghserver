@@ -1,6 +1,7 @@
 package com.pghserver.runtime.api;
 
 import com.pghserver.api.PghAPI;
+import com.pghserver.api.PghRelease;
 import com.pghserver.api.RouteHandler;
 import com.pghserver.runtime.Router;
 import org.intellij.lang.annotations.Language;
@@ -14,10 +15,12 @@ import java.util.regex.Pattern;
 public class PghServer implements PghAPI {
     private final @NotNull Path directory;
     private final @NotNull Router routes;
+    private final @NotNull PghRelease release;
 
-    public PghServer(@NotNull Path directory) {
+    public PghServer(@NotNull Path directory, @NotNull PghRelease release) {
         this.directory = directory;
         routes = new Router();
+        this.release = release;
     }
 
     @Override
@@ -43,5 +46,10 @@ public class PghServer implements PghAPI {
     @Override
     public @NotNull Path directory() {
         return directory;
+    }
+
+    @Override
+    public @NotNull PghRelease release() {
+        return release;
     }
 }

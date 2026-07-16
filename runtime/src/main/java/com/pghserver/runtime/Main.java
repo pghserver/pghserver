@@ -1,10 +1,12 @@
 package com.pghserver.runtime;
 
+import com.pghserver.api.PghRelease;
 import com.pghserver.api.type.ConnectionHeader;
 import com.pghserver.api.type.Request;
 import com.pghserver.api.type.Response;
 import com.pghserver.api.type.ResponseStatus;
 import com.pghserver.runtime.api.PghServer;
+import com.pghserver.runtime.api.RuntimeRelease;
 import com.pghserver.runtime.api.type.RuntimeRequest;
 import com.pghserver.runtime.api.type.RuntimeResponse;
 import com.pghserver.runtime.util.Logger;
@@ -24,7 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 public class Main {
-    private static final Logger logger = new Logger(Main.class, System.out, System.err, System.err, System.err);
+    private static final Logger logger = Logger.system(Main.class);
+    public static PghRelease release;
 
     private static void handlerAttempts(PghServer server, Request request, Response response, int handlerIdx) {
         var handlers = server.resolve(request.url().path());
@@ -65,6 +68,8 @@ public class Main {
     }
 
     static void main(String[] args) {
+        release = RuntimeRelease.instantiate(Main.class);
+
         int port = 80;
         if (args.length >= 1 && Pattern.compile("[0-9]+").matcher(args[0]).matches())
             port = Integer.parseInt(args[0]);
@@ -73,7 +78,7 @@ public class Main {
         if (args.length == 2)
             directory = Path.of(args[1]);
 
-        var server = new PghServer(directory);
+        var server = new PghServer(directory, release);
         PluginManager.load(server.directory().resolve("plugins"));
         PluginManager.onEnable(server);
         try (var serverSocket = new ServerSocket(port)) {

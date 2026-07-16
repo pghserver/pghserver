@@ -96,13 +96,22 @@ source directory depending on your setup. As Gradle users, we know by heart that
 But what does this manifest look like, you may ask?
 
 ```properties
+main-class=com.example.fooplugin.FooPlugin
 name=Foo Plugin
 version=1
-main-class=com.example.fooplugin.FooPlugin
 ```
 
 Yeah... dead simple, right? `name` can be any string, `version` can be any string (but will automatically have `v`
 prepended), and `main-class` is a string that must resolve to a valid class inside your JAR.
+
+> Or if your plugin is only compatible with a specific PghServer version:
+> ```properties
+> main-class=com.example.fooplugin.FooPlugin
+> name=Foo Plugin
+> version=1
+> pgh=4
+> ```
+> Replace `4` with your target version!
 
 Once you've got that manifest covered, you're ready to make some JARs! Well, just one. But that sounded cooler... did
 it?

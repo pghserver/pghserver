@@ -44,7 +44,12 @@ public interface PghAPI {
     @Nullable RouteHandler resolveFirst(@NotNull String path);
 
     /**
-     * @return Directory used by the server for various resources. Can be used by plugins, for example, static file directories and media storage.
+     * @return Directory used by the server for various resources. Can be used by plugins, for example, static file directories and media storage
      */
     @NotNull Path directory();
+
+    /**
+     * @return PghServer release data
+     */
+    @NotNull PghRelease release();
 }
